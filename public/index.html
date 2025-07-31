@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do Checklist</title>
+</head>
+<body>
+  <h1>To-Do List</h1>
+  <ul id="taskList"></ul>
+
+  <input type="text" id="taskInput" placeholder="Add new task">
+  <button onclick="addTask()">Add</button>
+
+  <script>
+    async function loadTasks() {
+      const res = await fetch('/tasks');
+      const tasks = await res.json();
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.textContent = task;
+        list.appendChild(li);
+      });
+    }
+
+    async function addTask() {
+      const input = document.getElementById('taskInput');
+      const task = input.value.trim();
+      if (!task) return;
+
+      await fetch('/tasks', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({task})
+      });
+
+      input.value = '';
+      loadTasks();
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
